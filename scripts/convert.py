@@ -807,12 +807,6 @@ def main():
             else:
                 normalized_dir = normalize_static_alpha_rope(report, args.model, cfg, out_dir)
 
-    if args.check:
-        report["status"] = "accepted"
-        write_report(report)
-        print(json.dumps(report, indent=2))
-        sys.exit(0)
-
     # ---------------- opt-ins ----------------
     params = getattr(getattr(base_info or info, "safetensors", None), "total", None)
     externalize = bool(params and params >= 3e9)
@@ -840,6 +834,12 @@ def main():
     if externalize:
         export_kwargs["prefill_lengths"] = [1024, 256, 64, 16, 4, 1]
         report["decisions"]["prefill_ladder"] = "reduced_7sig_3b"
+
+    if args.check:
+        report["status"] = "accepted"
+        write_report(report)
+        print(json.dumps(report, indent=2))
+        sys.exit(0)
 
     # ---------------- template lint (warn only) ----------------
     template = get_chat_template(args.model)
